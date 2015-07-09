@@ -7,7 +7,9 @@ var sizeY = 50
 var distX
 var distY
 var firstTouch = false
+var tile = []
 
+init()
 draw()
 
 var box1 = document.getElementById('box2'), boxleft, startx, dist = 0, touchobj = null
@@ -27,9 +29,8 @@ function handleMove(evt) {
   var el = document.getElementsByTagName("canvas")[0];
   var ctx = el.getContext("2d");
   var touches = evt.changedTouches;
-  console.log("HandleMovedUp");
-  if (firstTouch === true)  
- {	
+  if (firstTouch === true)
+  {	
 	if (touches[0].pageX >= boxX - 20)
 	{
 		if (touches[0].pageX <= boxX + 70)
@@ -79,8 +80,17 @@ function draw() {
     ctx.fillStyle = "black";
     boxX = boxX+10;
     boxY = boxY+40;
-    ctx.fillText("A",boxX,boxY);
+    ctx.fillText(tile[2],boxX,boxY);
     boxX = boxX-10;
     boxY = boxY-40; 
  }
+}
+
+function init() {
+  var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+  var letter = []
+  for (var i = 0; i < 7; i++){
+	letter[i] = ((Math.random()*26))
+  	tile[i] = alphabet.substring(letter[i],letter[i]+1)
+  }
 }
