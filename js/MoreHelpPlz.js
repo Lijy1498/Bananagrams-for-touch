@@ -6,6 +6,7 @@ var sizeX = 50
 var sizeY = 50
 var distX
 var distY
+var firstTouch = false
 
 draw()
 
@@ -16,26 +17,9 @@ function handleStart(evt) {
   var el = document.getElementsByTagName("canvas")[0];
   var ctx = el.getContext("2d");
   var touches = evt.changedTouches;
-  console.log(touches[0].pageX + " " + boxX);
-  if (touches[0].pageX >= boxX)
-  {
-  console.log("1");
-	if (touches[0].pageX <= boxX + 50)
-	{
-  console.log("2");
-		distX = touches[0].pageX-boxX
-	}
-  }
-  console.log(touches[0].pageY + " " + boxY);
-  if (touches[0].pageY >= boxY)
-  {
-  console.log("3");
-	if (touches[0].pageY <= boxY + 50)
-	{
-  console.log("4");
-		distY = touches[0].pageY-boxY
-	}
-  }  
+  firstTouch = true;
+  distX = touches[0].pageX-boxX
+  distY = touches[0].pageY-boxY
 }
 
 function handleMove(evt) {
@@ -44,19 +28,38 @@ function handleMove(evt) {
   var ctx = el.getContext("2d");
   var touches = evt.changedTouches;
   console.log("HandleMovedUp");
-  if (touches[0].pageX >= boxX)
-  {
-	if (touches[0].pageX <= boxX + 50)
+  if (firstTouch === true)  
+ {	
+	if (touches[0].pageX >= boxX)
 	{
-		if (touches[0].pageY >= boxY)
+		if (touches[0].pageX <= boxX + 50)
 		{
-			if (touches[0].pageY <= boxY + 50)
+			if (touches[0].pageY >= boxY)
 			{
-				boxX = touches[0].pageX - distX
-				boxY = touches[0].pageY - distY
-				draw()
+				if (touches[0].pageY <= boxY + 50)
+				{
+					boxX = touches[0].pageX - distX
+					boxY = touches[0].pageY - distY
+					draw()
+				}
+				else
+				{
+				firstTouch = false
+				}
+			}
+			else
+			{
+			firstTouch = false
 			}
 		}
+		else
+		{
+		firstTouch = false
+		}
+	}
+	else
+	{
+	firstTouch = false
 	}
   }
 }
