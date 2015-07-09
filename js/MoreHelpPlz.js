@@ -30,13 +30,13 @@ function handleMove(evt) {
   console.log("HandleMovedUp");
   if (firstTouch === true)  
  {	
-	if (touches[0].pageX >= boxX)
+	if (touches[0].pageX >= boxX - 20)
 	{
-		if (touches[0].pageX <= boxX + 50)
+		if (touches[0].pageX <= boxX + 70)
 		{
-			if (touches[0].pageY >= boxY)
+			if (touches[0].pageY >= boxY - 20)
 			{
-				if (touches[0].pageY <= boxY + 50)
+				if (touches[0].pageY <= boxY + 70)
 				{
 					boxX = touches[0].pageX - distX
 					boxY = touches[0].pageY - distY
