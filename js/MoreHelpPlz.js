@@ -8,6 +8,7 @@ var distX
 var distY
 var firstTouch = false
 var tile = []
+tile = {letter:0, posX:0, posY:500}
 
 init()
 draw()
@@ -78,19 +79,18 @@ function draw() {
     ctx.fillRect(boxX,boxY,sizeX,sizeY);
     ctx.font = "48px serif";
     ctx.fillStyle = "black";
-    boxX = boxX+10;
+    boxX = boxX+5;
     boxY = boxY+40;
-    ctx.fillText(tile[2],boxX,boxY);
-    boxX = boxX-10;
+    ctx.fillText(tile.letter[1],boxX,boxY);
+    boxX = boxX-5;
     boxY = boxY-40; 
  }
 }
 
 function init() {
-  var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
-  var letter = []
-  for (var i = 0; i < 7; i++){
-	letter[i] = ((Math.random()*26))
-  	tile[i] = alphabet.substring(letter[i],letter[i]+1)
+  var number = []
+  for (var i = 0; i < 5; i++){
+	number[i] = ((Math.random()*26))
+  	tile.letter[i] = String.fromCharCode(65+number[i])
   }
 }
