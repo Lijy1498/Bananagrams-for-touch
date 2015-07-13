@@ -1,96 +1,86 @@
-var ongoingTouches = new Array();
+var firstTouch = false;
+var board = {tile: []};
+var selectedTile = [];
 
-var boxX = 50
-var boxY = 50
-var sizeX = 50
-var sizeY = 50
-var distX
-var distY
-var firstTouch = false
-var tile = []
-tile = {letter:0, posX:0, posY:500}
+init();
+draw();
 
-init()
-draw()
-
-var box1 = document.getElementById('box2'), boxleft, startx, dist = 0, touchobj = null
 
 function handleStart(evt) {
   evt.preventDefault();
-  var el = document.getElementsByTagName("canvas")[0];
-  var ctx = el.getContext("2d");
-  var touches = evt.changedTouches;
-  firstTouch = true;
-  distX = touches[0].pageX-boxX
-  distY = touches[0].pageY-boxY
+  for (var i = 0; i < evt.changedTouches.length; i++)  {  
+    for (var g = 0; g < board.tile.length; g++) {
+      if (evt.changedTouches[i].pageX >= board.tile[g].X) {
+        if (evt.changedTouches[i].pageX <= board.tile[g].X+board.tile[g].Width) {
+          if (evt.changedTouches[i].pageY >= board.tile[g].Y) {   
+            if (evt.changedTouches[i].pageY <= board.tile[g].Y+board.tile[g].Height) {
+              board.tile[g].distX = evt.changedTouches[i].pageX-board.tile[g].X;
+              board.tile[g].distY = evt.changedTouches[i].pageY-board.tile[g].Y;
+              selectedTile[i] = g;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 function handleMove(evt) {
   evt.preventDefault();
-  var el = document.getElementsByTagName("canvas")[0];
-  var ctx = el.getContext("2d");
-  var touches = evt.changedTouches;
-  if (firstTouch === true)
-  {	
-	if (touches[0].pageX >= boxX - 20)
-	{
-		if (touches[0].pageX <= boxX + 70)
-		{
-			if (touches[0].pageY >= boxY - 20)
-			{
-				if (touches[0].pageY <= boxY + 70)
-				{
-					boxX = touches[0].pageX - distX
-					boxY = touches[0].pageY - distY
-					draw()
-				}
-				else
-				{
-				firstTouch = false
-				}
-			}
-			else
-			{
-			firstTouch = false
-			}
-		}
-		else
-		{
-		firstTouch = false
-		}
-	}
-	else
-	{
-	firstTouch = false
-	}
+  
+  for (var i = 0; i < evt.changedTouches.length; i++)  {	
+    if (selectedTile >= 0) {
+      board.tile[selectedTile[i]].X = evt.changedTouches[i].pageX - board.tile[selectedTile].distX;
+      board.tile[selectedTile[i]].Y = evt.changedTouches[i].pageY - board.tile[selectedTile].distY;
+      draw();
+    }
   }
 }
 
-var el = document.getElementsByTagName("canvas")[0];
-  el.addEventListener("touchstart", handleStart, false);
-  el.addEventListener("touchmove", handleMove, false)
+function handleEnd(evt) {
+  evt.preventDefault();
+  
+  for (var i = 0; i < evt.changedTouches.length; i++)  {  
+    selectedTile[i] = -1;
+  }
+}
 
+var el = document.getElementById("canvas");
+  el.addEventListener("touchstart", handleStart, false);
+  el.addEventListener("touchmove", handleMove, false);
+  el.addEventListener("touchend", handleEnd, false);
+  
 function draw() {
   var canvas = document.getElementById('canvas');
-  if (canvas.getContext) {
-    var ctx = canvas.getContext('2d');   
-    ctx.clearRect(0,0,600,600)
+  var ctx = canvas.getContext('2d');   
+  ctx.clearRect(0,0,600,600);
+  ctx.font = "48px serif";
+  for (var f = 0; f < 10; f++)
+  {
     ctx.fillStyle = "brown";
-    ctx.fillRect(boxX,boxY,sizeX,sizeY);
-    ctx.font = "48px serif";
+    ctx.fillRect(board.tile[f].X,board.tile[f].Y,board.tile[f].Width,board.tile[f].Height);
     ctx.fillStyle = "black";
-    boxX = boxX+5;
-    boxY = boxY+40;
-    ctx.fillText(tile.letter[1],boxX,boxY);
-    boxX = boxX-5;
-    boxY = boxY-40; 
- }
+    ctx.fillText(board.tile[f].letter,board.tile[f].X+5,board.tile[f].Y+40);
+  }
 }
 
 function init() {
-  var number = []
-  for (var i = 0; i < 5; i++){
-	number[i] = ((Math.random()*26))
-  	tile.letter[i] = String.fromCharCode(65+number[i])
+  var alphabet = "AAAAAAAAAAAAABBBCCCDDDDDDEEEEEEEEEEEEEEEEEEFFFGGGGHHHIIIIIIIIIIIIJJKKLLLLLLLLLLMMMNNNNNNNNOOOOOOOOOOOPPPQQRRRRRRRRRSSSSSSTTTTTTTTTUUUUUUVVVWWWXXYYYZZ";
+  var number = [];
+  var hold;
+  for (var i = 0; i < 10; i++){
+    number[i] = ((Math.random()*144));
+    for (var g = 0; g <= i; g++)
+    {
+      hold = Math.round(number[i]);
+      if (number[g] === hold)
+      {
+        number[i] = ((Math.random()*144));
+        g = 0;
+      }
+    }
+  number[i] = hold;
+  board.tile[i] = {letter: alphabet.substring(number[i],number[i]+1), X:60*i, Y:50, Width:50, Height:50, distX:-1, distY: -1};
   }
 }
