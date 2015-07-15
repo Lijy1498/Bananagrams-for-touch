@@ -67,6 +67,18 @@ function handleEnd(evt) {
             board.tile[path].oldY = board.tile[path].Y;
             board.tile[path].X = (Math.floor((board.tile[path].X + 30) / 60) * 60) + 5
             board.tile[path].Y = (Math.floor((board.tile[path].Y + 30) / 60) * 60) + 5
+            for (var g = 0; g < board.tile.length; g++) {
+                if (path != g) {
+                    if (board.tile[path].X === board.tile[g].X) {
+                        if (board.tile[path].Y === board.tile[g].Y) {
+                            board.tile[path].X = board.tile[path].previousX;
+                            board.tile[path].Y = board.tile[path].previousY;
+                        }
+                    }
+                }
+            }
+            board.tile[path].previousX = board.tile[path].X;
+            board.tile[path].previousY = board.tile[path].Y;
             draw();
             board.selectedTile[touch.identifier].tileNum = null;
         }
@@ -112,7 +124,7 @@ function init() {
             }
         }
         number[i] = hold;
-        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 60 * (i + 1) + 5, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545 };
+        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 60 * (i + 1) + 5, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 60 * (i + 1), previousY: 545 };
         board.selectedTile[i] = { tileNum: null }
     }
 }
