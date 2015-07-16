@@ -1,5 +1,5 @@
 //Declare Variables
-var board = { tile: [], selectedTile: [] };
+var board = { tile: [], selectedTile: [], tilesInPlay: 8 };
 var difference;
 
 //Start initialisers
@@ -15,7 +15,7 @@ function handleStart(evt) {
     for (var i = 0; i < evt.changedTouches.length; i++) {
         var touch = evt.changedTouches[i];
         //look at each tile  
-        for (var g = 0; g < board.tile.length; g++) {
+        for (var g = 0; g < board.tilesInPlay; g++) {
             //check it's location vs the touch
             if (touch.pageX >= board.tile[g].X) {
                 if (touch.pageX <= board.tile[g].X + board.tile[g].Width) {
@@ -67,15 +67,61 @@ function handleEnd(evt) {
             board.tile[path].oldY = board.tile[path].Y;
             board.tile[path].X = (Math.floor((board.tile[path].X + 30) / 60) * 60) + 5
             board.tile[path].Y = (Math.floor((board.tile[path].Y + 30) / 60) * 60) + 5
-            for (var g = 0; g < board.tile.length; g++) {
-                if (path != g) {
-                    if (board.tile[path].X === board.tile[g].X) {
-                        if (board.tile[path].Y === board.tile[g].Y) {
-                            board.tile[path].X = board.tile[path].previousX;
-                            board.tile[path].Y = board.tile[path].previousY;
+
+            //Dump
+            if (board.tile[path].Y === 5) {
+                board.tile[path].X = 5;
+                board.tile[path].Y = 545;
+
+                var stringHold = board.tile[path].letter;
+                board.tile[path].letter = board.tile[board.tile.length - board.tilesInPlay].letter;
+                board.tile[board.tile.length - board.tilesInPlay].letter = stringHold;
+                for (var h = 1; h <= 3; h++) {
+                    board.tile[board.tilesInPlay + h].X = 60 * h + 5;
+                    board.tile[board.tilesInPlay + h].Y = 545;
+                    for (var g = 0; g < board.tilesInPlay + h; g++) {
+                        if (board.tile[board.tilesInPlay + h].X === board.tile[g].X) {
+                            if (board.tile[board.tilesInPlay + h].Y === board.tile[g].Y) {
+                                board.tile[board.tilesInPlay + h].X = board.tile[board.tilesInPlay + h].X + 60;
+                                if (board.tile[board.tilesInPlay + h].X > 600) {
+                                    board.tile[board.tilesInPlay + h].Y = board.tile[board.tilesInPlay + h].Y - 60
+                                    board.tile[board.tilesInPlay + h].X = 5;
+                                }
+                                g = g - 1;
+                            }
                         }
                     }
                 }
+               board.tilesInPlay = board.tilesInPlay + 2;
+            }
+
+            for (var g = 0; g < board.tilesInPlay; g++) {
+                if (path != g) {
+                    if (board.tile[path].X === board.tile[g].X) {
+                        if (board.tile[path].Y === board.tile[g].Y) {
+                            if (board.tile[path].X === board.tile[g].X) {
+                                board.tile[path].X = board.tile[path].previousX;
+                                board.tile[path].Y = board.tile[path].previousY;
+                            }
+                        }
+                    }
+                }
+            }
+            if (board.tile[path].X < 0) {
+                board.tile[path].X = board.tile[path].previousX;
+                board.tile[path].Y = board.tile[path].previousY;
+            }
+            if (board.tile[path].X > 600) {
+                board.tile[path].X = board.tile[path].previousX;
+                board.tile[path].Y = board.tile[path].previousY;
+            }
+            if (board.tile[path].Y < 0) {
+                board.tile[path].X = board.tile[path].previousX;
+                board.tile[path].Y = board.tile[path].previousY;
+            }
+            if (board.tile[path].Y > 600) {
+                board.tile[path].X = board.tile[path].previousX;
+                board.tile[path].Y = board.tile[path].previousY;
             }
             board.tile[path].previousX = board.tile[path].X;
             board.tile[path].previousY = board.tile[path].Y;
@@ -96,10 +142,14 @@ function draw() {
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
     ctx.font = "48px serif";
-    for (var f = 0; f < board.tile.length; f++) {
+    for (var f = 0; f < board.tilesInPlay; f++) {
         ctx.clearRect(board.tile[f].oldX, board.tile[f].oldY, board.tile[f].Width, board.tile[f].Height);
     }
-    for (var f = 0; f < board.tile.length; f++) {
+    ctx.fillStyle = "red";
+    ctx.fillRect(0, 0, 600, 60);
+    ctx.fillStyle = "black";
+    ctx.fillText("DUMP ZONE", 150, 50);
+    for (var f = 0; f < board.tilesInPlay; f++) {
         ctx.fillStyle = "brown";
         ctx.fillRect(board.tile[f].X, board.tile[f].Y, board.tile[f].Width, board.tile[f].Height);
         ctx.fillStyle = "black";
@@ -114,7 +164,7 @@ function init() {
     var number = [];
     var hold;
     //Set variables for each tile
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 144; i++) {
         number[i] = ((Math.random() * 144));
         for (var g = 0; g <= i; g++) {
             hold = Math.round(number[i]);
@@ -124,7 +174,11 @@ function init() {
             }
         }
         number[i] = hold;
-        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 60 * (i + 1) + 5, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 60 * (i + 1), previousY: 545 };
+        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 60 * (i + 1) + 5, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 60 * (i + 1) + 5, previousY: 545 };
         board.selectedTile[i] = { tileNum: null }
     }
+}
+
+function tileCheck() {
+
 }
