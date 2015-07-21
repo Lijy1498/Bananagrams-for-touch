@@ -1,6 +1,7 @@
 //Declare Variables
-var board = { tile: [], selectedTile: [], tilesInPlay: 8, peelReady: false};
+var board = { tile: [], selectedTile: [], tilesInPlay: 8, peelReady: false, words: [] };
 var difference;
+var dictionary;
 
 //Start initialisers
 init();
@@ -96,18 +97,69 @@ function handleEnd(evt) {
                 board.tile[path].X = board.tile[path].previousX;
                 board.tile[path].Y = board.tile[path].previousY;
             }
+            if (board.tile[path].Y === 5) {
+                if (board.tile[path].X >= 450) {
+                    board.tile[path].X = board.tile[path].previousX;
+                    board.tile[path].Y = board.tile[path].previousY;
+                }
+            }
 
             //Dump
             if (board.tile[path].Y === 5) {
-                board.tile[path].X = board.tile[path].startX;
-                board.tile[path].Y = 545;
+                if (board.tile[path].X < 450) {
+                    board.tile[path].X = board.tile[path].startX;
+                    board.tile[path].Y = 545;
 
-                var stringHold = board.tile[path].letter;
-                board.tile[path].letter = board.tile[board.tile.length - board.tilesInPlay].letter;
-                board.tile[board.tile.length - board.tilesInPlay].letter = stringHold;
-                board.tilesInPlay = board.tilesInPlay + 2;
+                    var stringHold = board.tile[path].letter;
+                    board.tile[path].letter = board.tile[board.tile.length - board.tilesInPlay].letter;
+                    board.tile[board.tile.length - board.tilesInPlay].letter = stringHold;
+                    board.tilesInPlay = board.tilesInPlay + 2;
+                }
             }
 
+            //Peel check
+            var wordCount = -1;
+            var wordHold = "";
+            var peel = true;
+            for (var h = 0; h < board.tilesInPlay; h++) {
+                if (board.tile[h].Y > 540) {
+                    peel = false;
+                }
+            }
+            if (peel === true) {
+                for (var x = 5; x < 545; x = x + 60) {
+                    for (var y = 65; y < 545; y = y + 60) {
+                        for (var g = 0; g < board.tilesInPlay; g++) {
+                            if (peel === true) {
+                                if (board.tile[g].X === x && board.tile[g].Y === y) {
+                                    wordHold = wordHold + board.tile[g].letter;
+                                    break;
+                                } else if (g === board.tilesInPlay - 1) {
+                                    if (wordHold.length === 1) {
+                                        var notAWord = true;
+                                        for (var f = 0; f < board.tilesInPlay; f++) {
+                                            if (board.tile[f].X === x + 60) {
+                                                if (board.tile[f].Y === y - 60) {
+                                                    notAWord = false
+                                                    wordHold = "";
+                                                }
+                                            }
+                                        }
+                                        if (notAWord === true) {
+                                            peel = false;
+                                            wordHold = "";
+                                        }
+                                    } else if (wordHold.length > 1) {
+                                        wordCount++;
+                                        board.words[wordCount] = wordHold;
+                                        wordHold = "";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             board.tile[path].previousX = board.tile[path].X;
             board.tile[path].previousY = board.tile[path].Y;
             draw();
