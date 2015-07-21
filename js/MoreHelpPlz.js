@@ -20,7 +20,7 @@ function handleStart(evt) {
             if (touch.pageY <= 60) {
                 board.tilesInPlay = board.tilesInPlay + 1;
                 board.peelReady = false;
-                draw;
+                draw();
             }
         }
         for (var g = 0; g < board.tilesInPlay; g++) {
@@ -209,12 +209,14 @@ function handleEnd(evt) {
                         }
                     }
                 }
-                if (peel != false) {
-                    board.peelReady = true;
-                } else {
-                    board.peelReady = false;
-                }
             }
+            if (peel != false) {
+                board.peelReady = true;
+            } else {
+                board.peelReady = false;
+            }
+
+
             board.tile[path].previousX = board.tile[path].X;
             board.tile[path].previousY = board.tile[path].Y;
             draw();
