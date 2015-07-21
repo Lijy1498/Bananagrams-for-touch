@@ -16,6 +16,13 @@ function handleStart(evt) {
     for (var i = 0; i < evt.changedTouches.length; i++) {
         var touch = evt.changedTouches[i];
         //look at each tile  
+        if (touch.pageX >= 450) {
+            if (touch.pageY <= 60) {
+                board.tilesInPlay = board.tilesInPlay + 1;
+                board.peelReady = false;
+                draw;
+            }
+        }
         for (var g = 0; g < board.tilesInPlay; g++) {
             //check it's location vs the touch
             if (touch.pageX >= board.tile[g].X) {
@@ -121,6 +128,9 @@ function handleEnd(evt) {
             var wordCount = -1;
             var wordHold = "";
             var peel = true;
+            for (var h = 0; h < board.words.length; h++) {
+                board.words[h] = null;
+            }
             for (var h = 0; h < board.tilesInPlay; h++) {
                 if (board.tile[h].Y > 540) {
                     peel = false;
@@ -138,8 +148,11 @@ function handleEnd(evt) {
                                     if (wordHold.length === 1) {
                                         var notAWord = true;
                                         for (var f = 0; f < board.tilesInPlay; f++) {
-                                            if (board.tile[f].X === x + 60) {
-                                                if (board.tile[f].Y === y - 60) {
+                                            if (board.tile[f].Y === y - 60) {
+                                                if (board.tile[f].X === x - 60) {
+                                                    notAWord = false
+                                                    wordHold = "";
+                                                } else if (board.tile[f].X === x + 60) {
                                                     notAWord = false
                                                     wordHold = "";
                                                 }
@@ -158,6 +171,48 @@ function handleEnd(evt) {
                             }
                         }
                     }
+                }
+                if (peel != false) {
+                    for (var y = 65; y < 545; y = y + 60) {
+                        for (var x = 5; x < 545; x = x + 60) {
+                            for (var g = 0; g < board.tilesInPlay; g++) {
+                                if (peel === true) {
+                                    if (board.tile[g].X === x && board.tile[g].Y === y) {
+                                        wordHold = wordHold + board.tile[g].letter;
+                                        break;
+                                    } else if (g === board.tilesInPlay - 1) {
+                                        if (wordHold.length === 1) {
+                                            var notAWord = true;
+                                            for (var f = 0; f < board.tilesInPlay; f++) {
+                                                if (board.tile[f].X === x - 60) {
+                                                    if (board.tile[f].Y === y + 60) {
+                                                        notAWord = false
+                                                        wordHold = "";
+                                                    } else if (board.tile[f].Y === y - 60) {
+                                                            notAWord = false
+                                                            wordHold = "";
+                                                        }
+                                                }
+                                            }
+                                            if (notAWord === true) {
+                                                peel = false;
+                                                wordHold = "";
+                                            }
+                                        } else if (wordHold.length > 1) {
+                                            wordCount++;
+                                            board.words[wordCount] = wordHold;
+                                            wordHold = "";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (peel != false) {
+                    board.peelReady = true;
+                } else {
+                    board.peelReady = false;
                 }
             }
             board.tile[path].previousX = board.tile[path].X;
