@@ -1,13 +1,8 @@
 //Declare Variables
 var board = { tile: [], selectedTile: [], tilesInPlay: 8, peelReady: false, words: [] };
 var difference;
-var dictionary;
 
-//Start initialisers
 init();
-
-//Draw the first frame
-draw();
 
 //On a touch...
 function handleStart(evt) {
@@ -211,7 +206,16 @@ function handleEnd(evt) {
                 }
             }
             if (peel != false) {
-                board.peelReady = true;
+                for (var f = 0; f <= wordCount; f++) {
+                    var holding = board.words[f].toLowerCase();
+                    if (dictionary[holding]) {
+                        if (peel === true) {
+                            board.peelReady = true;
+                        }
+                    } else {
+                        peel = false;
+                    }
+                }
             } else {
                 board.peelReady = false;
             }
@@ -286,4 +290,5 @@ function init() {
         board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 4 * (i + 1) + 5, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5 };
         board.selectedTile[i] = { tileNum: null }
     }
+    draw();
 }
