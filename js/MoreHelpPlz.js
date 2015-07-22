@@ -137,8 +137,8 @@ function handleEnd(evt) {
                 }
             }
             if (peel === true) {
-                for (var x = 5; x < 545; x = x + 60) {
-                    for (var y = 65; y < 545; y = y + 60) {
+                for (var x = 5; x <= 545; x = x + 60) {
+                    for (var y = 65; y <= 545; y = y + 60) {
                         for (var g = 0; g < board.tilesInPlay; g++) {
                             if (peel === true) {
                                 if (board.tile[g].X === x && board.tile[g].Y === y) {
@@ -173,8 +173,8 @@ function handleEnd(evt) {
                     }
                 }
                 if (peel != false) {
-                    for (var y = 65; y < 545; y = y + 60) {
-                        for (var x = 5; x < 545; x = x + 60) {
+                    for (var y = 65; y <= 545; y = y + 60) {
+                        for (var x = 5; x <= 545; x = x + 60) {
                             for (var g = 0; g < board.tilesInPlay; g++) {
                                 if (peel === true) {
                                     if (board.tile[g].X === x && board.tile[g].Y === y) {
@@ -283,7 +283,7 @@ function init() {
             }
         }
         number[i] = hold;
-        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 4 * (i + 1) + 5, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 60 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5 };
+        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 4 * (i + 1) + 5, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5 };
         board.selectedTile[i] = { tileNum: null }
     }
 }
