@@ -184,9 +184,9 @@ function handleEnd(evt) {
                                                         notAWord = false
                                                         wordHold = "";
                                                     } else if (board.tile[f].Y === y - 60) {
-                                                            notAWord = false
-                                                            wordHold = "";
-                                                        }
+                                                        notAWord = false
+                                                        wordHold = "";
+                                                    }
                                                 }
                                             }
                                             if (notAWord === true) {
@@ -214,6 +214,7 @@ function handleEnd(evt) {
                         }
                     } else {
                         peel = false;
+                        board.peelReady = false;
                     }
                 }
             } else {
