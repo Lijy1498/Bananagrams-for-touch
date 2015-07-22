@@ -116734,6 +116734,7 @@ var dictionary = {
 "pzazz": 1,
 "qadi": 1,
 "qadis": 1,
+"qaid": 1,
 "qanat": 1,
 "qanats": 1,
 "qasida": 1,
