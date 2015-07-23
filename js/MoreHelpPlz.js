@@ -166,6 +166,30 @@ function handleEnd(evt) {
                             }
                         }
                     }
+                    if (wordHold.length != 1) {
+                        if (wordHold.length === 1) {
+                            var notAWord = true;
+                            for (var f = 0; f < board.tilesInPlay; f++) {
+                                if (board.tile[f].X === x - 60) {
+                                    if (board.tile[f].Y === y + 60) {
+                                        notAWord = false
+                                        wordHold = "";
+                                    } else if (board.tile[f].Y === y - 60) {
+                                        notAWord = false
+                                        wordHold = "";
+                                    }
+                                }
+                            }
+                            if (notAWord === true) {
+                                peel = false;
+                                wordHold = "";
+                            }
+                        } else if (wordHold.length > 1) {
+                            wordCount++;
+                            board.words[wordCount] = wordHold;
+                            wordHold = "";
+                        }
+                    }
                 }
                 if (peel != false) {
                     for (var y = 65; y <= 545; y = y + 60) {
@@ -200,6 +224,30 @@ function handleEnd(evt) {
                                         }
                                     }
                                 }
+                            }
+                        }
+                        if (wordHold.length != 1) {
+                            if (wordHold.length === 1) {
+                                var notAWord = true;
+                                for (var f = 0; f < board.tilesInPlay; f++) {
+                                    if (board.tile[f].X === x - 60) {
+                                        if (board.tile[f].Y === y + 60) {
+                                            notAWord = false
+                                            wordHold = "";
+                                        } else if (board.tile[f].Y === y - 60) {
+                                            notAWord = false
+                                            wordHold = "";
+                                        }
+                                    }
+                                }
+                                if (notAWord === true) {
+                                    peel = false;
+                                    wordHold = "";
+                                }
+                            } else if (wordHold.length > 1) {
+                                wordCount++;
+                                board.words[wordCount] = wordHold;
+                                wordHold = "";
                             }
                         }
                     }
