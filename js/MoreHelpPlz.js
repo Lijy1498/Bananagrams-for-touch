@@ -1,6 +1,9 @@
 //Declare Variables
 var board = { tile: [], selectedTile: [], tilesInPlay: 8, peelReady: false, words: [] };
 var difference;
+var selectedTile;
+var distanceX;
+var distanceY;
 
 init();
 
@@ -10,14 +13,31 @@ function handleStart(evt) {
     //for each touch
     for (var i = 0; i < evt.changedTouches.length; i++) {
         var touch = evt.changedTouches[i];
-        //look at each tile  
+        //Peel
         if (touch.pageX >= 450) {
             if (touch.pageY <= 60) {
                 board.tilesInPlay = board.tilesInPlay + 1;
+                board.tile[board.tilesInPlay].newX = 5;
+                board.tile[board.tilesInPlay].Y = 65;
+                for (var g = 0; g < board.tilesInPlay; g++) {
+                    if (board.tile[board.tilesInPlay].newX === board.tile[g].X) {
+                        if (board.tile[board.tilesInPlay].Y === board.tile[g].Y) {
+                            board.tile[board.tilesInPlay].newX = board.tile[board.tilesInPlay].X + 60;
+                            if (board.tile[board.tilesInPlay].newX >= 600) {
+                                board.tile[board.tilesInPlay].Y = board.tile[board.tilesInPlay].Y + 60;
+                                board.tile[board.tilesInPlay].newX = 5;
+                            }
+
+                            g = 0;
+                        }
+                    }
+                }
                 board.peelReady = false;
-                draw();
+                selectedTile = board.tilesInPlay;
+                move(function (p) { return p }, 2000, board.tile[board.tilesInPlay].newX - board.tile[board.tilesInPlay].X, board.tile[board.tilesInPlay].newY - board.tile[board.tilesInPlay].Y);
             }
         }
+        //look at each tile  
         for (var g = 0; g < board.tilesInPlay; g++) {
             //check it's location vs the touch
             if (touch.pageX >= board.tile[g].X) {
@@ -111,7 +131,7 @@ function handleEnd(evt) {
                 if (board.tile[path].X < 450) {
                     board.tile[path].X = 5;
                     board.tile[path].Y = 65;
-                    board.tile[board.tilesInPlay+1].X = 65;
+                    board.tile[board.tilesInPlay + 1].X = 65;
                     board.tile[board.tilesInPlay + 1].Y = 65;
                     board.tile[board.tilesInPlay + 2].X = 125;
                     board.tile[board.tilesInPlay + 2].Y = 65;
@@ -300,7 +320,7 @@ el.addEventListener("touchstart", handleStart, false);
 el.addEventListener("touchmove", handleMove, false);
 el.addEventListener("touchend", handleEnd, false);
 
-//Redraw the frame  
+//Redraw the frame
 function draw() {
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
@@ -330,6 +350,37 @@ function draw() {
     }
 }
 
+function move(delta, duration, distanceX, distanceY) {
+    var toX = distanceX;
+    var toY = distanceY;
+    var holdX = 300;
+    var holdY = -65;
+
+    animate({
+        delay: 10,
+        duration: duration || 2000,
+        delta: delta,
+        step: function (delta) {
+            board.tile[selectedTile].X = (toX * delta) + holdX;
+            board.tile[selectedTile].Y = (toY * delta) + holdY;
+            draw();
+        }
+    })
+}
+
+function animate(opts) {
+    var start = new Date
+    var id = setInterval(function () {
+        var timePassed = new Date - start
+        var progress = timePassed / opts.duration
+        if (progress > 1) progress = 1
+        opts.step(progress)
+        if (progress == 2) {
+            clearInterval(id)
+        }
+    }, opts.delay || 10)
+}
+
 //At the start of the program
 function init() {
     //declare variables
@@ -349,7 +400,7 @@ function init() {
         }
 
         number[i] = hold;
-        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 0, Y: 545, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5, checked: false };
+        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5, checked: false, newX : null, newY: null};
 
         board.selectedTile[i] = { tileNum: null }
     }
