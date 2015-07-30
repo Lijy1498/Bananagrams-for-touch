@@ -13,30 +13,30 @@ function handleStart(evt) {
     for (var i = 0; i < evt.changedTouches.length; i++) {
         var touch = evt.changedTouches[i];
         //Peel
-        if (board.peelReady) {
+    //    if (board.peelReady) {
             if (touch.pageX >= 450) {
                 if (touch.pageY <= 60) {
+                    board.tilesInPlay = board.tilesInPlay + 1;
                     board.tile[board.tilesInPlay].X = 5;
                     board.tile[board.tilesInPlay].Y = 65;
                     for (var g = 0; g < board.tilesInPlay; g++) {
-                        if (board.tile[board.tilesInPlay + 1].X === board.tile[g].X) {
-                            if (board.tile[board.tilesInPlay + 1].Y === board.tile[g].Y) {
-                                board.tile[board.tilesInPlay + 1].X = board.tile[board.tilesInPlay + 1].X + 60;
-                                if (board.tile[board.tilesInPlay + 1].X >= 600) {
-                                    board.tile[board.tilesInPlay + 1].Y = board.tile[board.tilesInPlay + 1].Y + 60;
-                                    board.tile[board.tilesInPlay + 1].X = 5;
+                        if (board.tile[board.tilesInPlay].X === board.tile[g].X) {
+                            if (board.tile[board.tilesInPlay].Y === board.tile[g].Y) {
+                                board.tile[board.tilesInPlay].X = board.tile[board.tilesInPlay].X + 60;
+                                if (board.tile[board.tilesInPlay].X >= 600) {
+                                    board.tile[board.tilesInPlay].Y = board.tile[board.tilesInPlay].Y + 60;
+                                    board.tile[board.tilesInPlay].X = 5;
                                 }
                                 g = 0;
                             }
                         }
                     }
                     board.peelReady = false;
-                    board.tilesInPlay = board.tilesInPlay + 1;
-                    move(function (p) { return p }, 500, board.tile[board.tilesInPlay].X - 300, board.tile[board.tilesInPlay].Y + 65, board.tilesInPlay);
+                    move(function (p) { return p }, 500, board.tile[board.tilesInPlay].X - 300, board.tile[board.tilesInPlay].Y + 65, board.tilesInPlay-1);
                     board.tile[board.tilesInPlay].X = 300;
                     board.tile[board.tilesInPlay].Y = -65;
                 }
-            }
+       //     }
         }
         //look at each tile  
         for (var g = 0; g < board.tilesInPlay; g++) {
