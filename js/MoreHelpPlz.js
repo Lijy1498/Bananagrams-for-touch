@@ -13,28 +13,29 @@ function handleStart(evt) {
     for (var i = 0; i < evt.changedTouches.length; i++) {
         var touch = evt.changedTouches[i];
         //Peel
-//        if (board.peelReady) {
+        if (board.peelReady) {
             if (touch.pageX >= 450) {
                 if (touch.pageY <= 60) {
-                    board.tilesInPlay = board.tilesInPlay + 1;
-                    board.tile[board.tilesInPlay].newX = 5;
-                    board.tile[board.tilesInPlay].newY = 65;
+                    board.tile[board.tilesInPlay].X = 5;
+                    board.tile[board.tilesInPlay].Y = 65;
                     for (var g = 0; g < board.tilesInPlay; g++) {
-                        if (board.tile[board.tilesInPlay].newX === board.tile[g].X) {
-                            if (board.tile[board.tilesInPlay].Y === board.tile[g].Y) {
-                                board.tile[board.tilesInPlay].newX = board.tile[board.tilesInPlay].X + 60;
-                                if (board.tile[board.tilesInPlay].newX >= 600) {
-                                    board.tile[board.tilesInPlay].Y = board.tile[board.tilesInPlay].Y + 60;
-                                    board.tile[board.tilesInPlay].newX = 5;
+                        if (board.tile[board.tilesInPlay + 1].X === board.tile[g].X) {
+                            if (board.tile[board.tilesInPlay + 1].Y === board.tile[g].Y) {
+                                board.tile[board.tilesInPlay + 1].X = board.tile[board.tilesInPlay + 1].X + 60;
+                                if (board.tile[board.tilesInPlay + 1].X >= 600) {
+                                    board.tile[board.tilesInPlay + 1].Y = board.tile[board.tilesInPlay + 1].Y + 60;
+                                    board.tile[board.tilesInPlay + 1].X = 5;
                                 }
-
                                 g = 0;
                             }
                         }
                     }
                     board.peelReady = false;
-                    move(function (p) { return p }, 2000, board.tile[board.tilesInPlay].newX - board.tile[board.tilesInPlay].X, board.tile[board.tilesInPlay].newY - board.tile[board.tilesInPlay].Y,board.tilesInPlay);
-  //              }
+                    board.tilesInPlay = board.tilesInPlay + 1;
+                    move(function (p) { return p }, 500, board.tile[board.tilesInPlay].X - 300, board.tile[board.tilesInPlay].Y + 65, board.tilesInPlay);
+                    board.tile[board.tilesInPlay].X = 300;
+                    board.tile[board.tilesInPlay].Y = -65;
+                }
             }
         }
         //look at each tile  
@@ -162,7 +163,17 @@ function handleEnd(evt) {
                     var stringHold = board.tile[path].letter;
                     board.tile[path].letter = board.tile[board.tile.length - board.tilesInPlay].letter;
                     board.tile[board.tile.length - board.tilesInPlay].letter = stringHold;
-                    board.tilesInPlay = board.tilesInPlay + 2;
+                    move(function (p) { return p }, 250, board.tile[path].X - 300, board.tile[path].Y + 65, path);
+                    board.tile[path].X = 300;
+                    board.tile[path].Y = -65;
+                    move(function (p) { return p }, 250, board.tile[board.tilesInPlay + 1].X - 300, board.tile[board.tilesInPlay + 1].Y + 65, board.tilesInPlay + 1);
+                    board.tile[board.tilesInPlay + 1].X = 300;
+                    board.tile[board.tilesInPlay + 1].Y = -65;
+                    move(function (p) { return p }, 250, board.tile[board.tilesInPlay + 2].X - 300, board.tile[board.tilesInPlay + 2].Y + 65, board.tilesInPlay + 2);
+                    board.tile[board.tilesInPlay + 2].X = 300;
+                    board.tile[board.tilesInPlay + 2].Y = -65;
+
+                    board.tilesInPlay = board.tilesInPlay + 3;
                 }
             }
 
@@ -350,7 +361,7 @@ function draw() {
     }
 }
 
-function move(delta, duration, distanceX, distanceY,selectedTile) {
+function move(delta, duration, distanceX, distanceY, selectedTile) {
     var toX = distanceX;
     var toY = distanceY;
     var holdX = 300;
@@ -358,7 +369,7 @@ function move(delta, duration, distanceX, distanceY,selectedTile) {
 
     animate({
         delay: 10,
-        duration: 2000,
+        duration: duration || 2000,
         delta: delta,
         step: function (delta) {
             board.tile[selectedTile].X = (toX * delta) + holdX;
@@ -400,7 +411,7 @@ function init() {
         }
 
         number[i] = hold;
-        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5, checked: false, newX : null, newY: null};
+        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5, checked: false, newX: null, newY: null };
 
         board.selectedTile[i] = { tileNum: null }
     }
@@ -438,7 +449,4 @@ function init() {
         }
     }
     draw();
-    move(function (p) { return p }, 2000, -295, 130,1);
-    move(function (p) { return p }, 2000, -235, 130,2);
-    move(function (p) { return p }, 2000, -175, 130,3);
 }
