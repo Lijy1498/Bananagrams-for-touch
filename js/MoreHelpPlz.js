@@ -183,7 +183,7 @@ function handleEnd(evt) {
                     if (board.tile[g + addition].inPlay === false) {
                         addition++;
                         g--;
-                    } else if (path != g) {
+                    } else if (path != g + addition) {
                         if (board.tile[path].X === board.tile[g + addition].X) {
                             if (board.tile[path].Y === board.tile[g + addition].Y) {
                                 if (board.tile[path].X === board.tile[g + addition].X) {
