@@ -127,34 +127,50 @@ function handleEnd(evt) {
         if (board.selectedTile[touch.identifier].tileNum != null) {
             var path = board.selectedTile[touch.identifier].tileNum
             if (board.previousTouchY[touch.identifier] - board.tile[path].oldY < -20) {
-                board.tile[path].X = 5;
-                board.tile[path].Y = 65;
-                board.tile[board.tilesInPlay + 1].X = 65;
-                board.tile[board.tilesInPlay + 1].Y = 65;
-                board.tile[board.tilesInPlay + 2].X = 125;
-                board.tile[board.tilesInPlay + 2].Y = 65;
-                for (var h = 0; h < 3; h++) {
-                    var hold;
-                    if (h === 0) {
-                        hold = path;
-                    } else {
-                        hold = board.tilesInPlay + h;
+                board.tile[path].inPlay = false;
+                board.tilesInPlay = board.tilesInPlay + 2;
+                var addition = 0;
+                var holdIt = [];
+                for (var g = 0; g < 3; g++) {
+                    var hold1 = Math.round((Math.random() * (144 - board.tilesInPlay)));
+                    for (var h = 0; h <= hold1; h++) {
+                        if (board.tile[h + addition].inPlay) {
+                            addition++;
+                            h--;
+                        } else {
+                            if (h === hold1) {
+                                holdIt[g] = h + addition;
+                            }
+                        }
                     }
-                    for (var g = 0; g < board.tilesInPlay + 2; g++) {
-                        if (hold != g) {
-                            if (board.tile[hold].X === board.tile[g].X) {
-                                if (board.tile[hold].Y === board.tile[g].Y) {
-                                    board.tile[hold].X = board.tile[hold].X + 60;
-                                    if (board.tile[hold].X >= 600) {
-                                        board.tile[hold].Y = board.tile[hold].Y + 60;
-                                        board.tile[hold].X = 5;
-                                    }
+                    board.tile[holdIt[g]].X = 5;
+                    board.tile[holdIt[g]].Y = 65;
+                    board.tile[holdIt[g]].inPlay = true;
+                    addition = 0;
+                }
 
-                                    g = 0;
+                for (var h = 0; h < 3; h++) {
+                    for (var g = 0; g <= board.tilesInPlay; g++) {
+                        if (g + addition < 144) {
+                            if (board.tile[g + addition].inPlay === false) {
+                                addition++;
+                                g--;
+                            } else if (holdIt[h] != g + addition) {
+                                if (board.tile[holdIt[h]].X === board.tile[g + addition].X) {
+                                    if (board.tile[holdIt[h]].Y === board.tile[g + addition].Y) {
+                                        board.tile[holdIt[h]].X = board.tile[holdIt[h]].X + 60;
+                                        if (board.tile[holdIt[h]].X >= 600) {
+                                            board.tile[holdIt[h]].Y = board.tile[holdIt[h]].Y + 60;
+                                            board.tile[holdIt[h]].X = 5;
+                                        }
+
+                                        g = 0;
+                                    }
                                 }
                             }
                         }
                     }
+                    addition = 0;
                 }
 
                 var stringHold = board.tile[path].letter;
