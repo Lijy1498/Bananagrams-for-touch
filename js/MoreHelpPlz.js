@@ -173,20 +173,15 @@ function handleEnd(evt) {
                     addition = 0;
                 }
 
-                var stringHold = board.tile[path].letter;
-                board.tile[path].letter = board.tile[board.tile.length - board.tilesInPlay].letter;
-                board.tile[board.tile.length - board.tilesInPlay].letter = stringHold;
-                move(function (p) { return p }, 250, board.tile[path].X - 300, board.tile[path].Y + 65, path, 300, -65);
-                board.tile[path].X = 300;
-                board.tile[path].Y = -65;
-                move(function (p) { return p }, 250, board.tile[board.tilesInPlay + 1].X - 300, board.tile[board.tilesInPlay + 1].Y + 65, board.tilesInPlay + 1, 300, -65);
-                board.tile[board.tilesInPlay + 1].X = 300;
-                board.tile[board.tilesInPlay + 1].Y = -65;
-                move(function (p) { return p }, 250, board.tile[board.tilesInPlay + 2].X - 300, board.tile[board.tilesInPlay + 2].Y + 65, board.tilesInPlay + 2, 300, -65);
-                board.tile[board.tilesInPlay + 2].X = 300;
-                board.tile[board.tilesInPlay + 2].Y = -65;
-
-                board.tilesInPlay = board.tilesInPlay + 3;
+                move(function (p) { return p }, 250, board.tile[holdIt[0]].X - 300, board.tile[holdIt[0]].Y + 65, holdIt[0], 300, -65);
+                board.tile[holdIt[0]].X = 300;
+                board.tile[holdIt[0]].Y = -65;
+                move(function (p) { return p }, 250, board.tile[holdIt[1]].X - 300, board.tile[holdIt[1]].Y + 65, holdIt[1], 300, -65);
+                board.tile[holdIt[1]].X = 300;
+                board.tile[holdIt[1]].Y = -65;
+                move(function (p) { return p }, 250, board.tile[holdIt[2]].X - 300, board.tile[holdIt[2]].Y + 65, holdIt[2], 300, -65);
+                board.tile[holdIt[2]].X = 300;
+                board.tile[holdIt[2]].Y = -65;
 
             }
             board.tile[path].oldX = board.tile[path].X;
