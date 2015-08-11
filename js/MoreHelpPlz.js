@@ -33,15 +33,16 @@ function handleStart(evt) {
 
                 board.tile[hold].X = 5;
                 board.tile[hold].Y = 65;
+
                 addition = 0;
-                for (var g = 0; g < board.tilesInPlay - 1; g++) {
+                for (var g = 0; g <= board.tilesInPlay; g++) {
                     if (g + addition < 144) {
                         if (board.tile[g + addition].inPlay === false) {
                             addition++;
                             g--;
                         } else {
-                            if (board.tile[hold].X === board.tile[g + addition].X) {
-                                if (board.tile[hold].Y === board.tile[g + addition].Y) {
+                            if (board.tile[hold].X === board.tile[g + addition].previousX) {
+                                if (board.tile[hold].Y === board.tile[g + addition].previousY) {
                                     board.tile[hold].X = board.tile[hold].X + 60;
                                     if (board.tile[hold].X >= 600) {
                                         board.tile[hold].Y = board.tile[hold].Y + 60;
@@ -55,6 +56,8 @@ function handleStart(evt) {
                 }
                 addition = 0;
                 board.peelReady = false;
+                board.tile[hold - 1].previousX = board.tile[hold - 1].X;
+                board.tile[hold - 1].previousY = board.tile[hold - 1].Y;
                 move(function (p) { return p }, 250, board.tile[hold].X - 300, board.tile[hold].Y + 65, hold - 1, 300, -65);
                 board.tile[hold - 1].X = 300;
                 board.tile[hold - 1].Y = -65;
@@ -143,14 +146,16 @@ function handleEnd(evt) {
                             }
                         }
                     }
-                    board.tile[holdIt[g]].X = 5;
+                    board.tile[holdIt[g]].X = 5 + 60 * g;
                     board.tile[holdIt[g]].Y = 65;
+                    board.tile[holdIt[g]].previousX = board.tile[holdIt[g]].X;
+                    board.tile[holdIt[g]].previousY = board.tile[holdIt[g]].Y;
                     board.tile[holdIt[g]].inPlay = true;
                     addition = 0;
                 }
 
                 for (var h = 0; h < 3; h++) {
-                    for (var g = 0; g <= board.tilesInPlay; g++) {
+                    for (var g = 0; g <= board.tilesInPlay + 1; g++) {
                         if (g + addition < 144) {
                             if (board.tile[g + addition].inPlay === false) {
                                 addition++;
@@ -163,7 +168,8 @@ function handleEnd(evt) {
                                             board.tile[holdIt[h]].Y = board.tile[holdIt[h]].Y + 60;
                                             board.tile[holdIt[h]].X = 5;
                                         }
-
+                                        board.tile[holdIt[h]].previousX = board.tile[holdIt[h]].X;
+                                        board.tile[holdIt[h]].previousY = board.tile[holdIt[h]].Y;
                                         g = 0;
                                     }
                                 }
@@ -238,9 +244,10 @@ function handleEnd(evt) {
                 board.words[h] = null;
             }
             if (peel === true) {
-                for (var x = 5; x <= 545; x = x + 60) {
-                    for (var y = 65; y < 600; y = y + 60) {
-                        for (var g = 0; g < board.tilesInPlay; g++) {
+                for (var x = 5; x <= 600; x = x + 60) {
+                    for (var y = 5; y < 600; y = y + 60) {
+                        addition = 0;
+                        for (var g = 0; g <= board.tilesInPlay; g++) {
                             if (peel === true) {
                                 if (g + addition < 144) {
                                     if (board.tile[g + addition].inPlay === false) {
@@ -250,6 +257,7 @@ function handleEnd(evt) {
                                         wordHold = wordHold + board.tile[g + addition].letter;
                                         break;
                                     } else if (g === board.tilesInPlay - 1) {
+                                        addition = 0;
                                         if (wordHold.length === 1) {
                                             var notAWord = true;
                                             for (var f = 0; f < board.tilesInPlay; f++) {
@@ -285,8 +293,9 @@ function handleEnd(evt) {
                 }
                 addition = 0;
                 if (peel != false) {
-                    for (var y = 65; y <= 545; y = y + 60) {
-                        for (var x = 5; x <= 545; x = x + 60) {
+                    for (var y = 5; y <= 600; y = y + 60) {
+                        for (var x = 5; x <= 600; x = x + 60) {
+                            addition = 0;
                             for (var g = 0; g < board.tilesInPlay; g++) {
                                 if (peel === true) {
                                     if (g + addition < 144) {
@@ -297,6 +306,7 @@ function handleEnd(evt) {
                                             wordHold = wordHold + board.tile[g + addition].letter;
                                             break;
                                         } else if (g === board.tilesInPlay - 1) {
+                                            addition = 0;
                                             if (wordHold.length === 1) {
                                                 var notAWord = true;
                                                 for (var f = 0; f < board.tilesInPlay; f++) {
@@ -398,7 +408,7 @@ function handleEnd(evt) {
                                         }
                                     }
                                 }
-                            } 
+                            }
                         }
                     } else {
                         peel = false;
@@ -444,7 +454,7 @@ function draw() {
     ctx.fillRect(449, 0, 1, 55);
 
     var addition = 0;
-    for (var f = 0; f <= board.tilesInPlay - 1; f++) {
+    for (var f = 0; f <= board.tilesInPlay; f++) {
         if (f + addition < 144) {
             if (board.tile[f + addition].inPlay) {
                 ctx.fillStyle = "black";
@@ -509,7 +519,7 @@ function init() {
         }
 
         number[i] = hold;
-        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5, checked: false, newX: null, newY: null, inPlay: false };
+        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5, checked: false, inPlay: false };
 
         board.selectedTile[i] = { tileNum: null }
     }
