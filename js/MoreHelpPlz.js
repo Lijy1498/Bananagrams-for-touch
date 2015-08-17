@@ -23,78 +23,80 @@ function handleStart(evt) {
             }
         }
 
-        //Peel
-        //    if (board.peelReady) {
-        if (touch.pageX >= 450) {
-            if (touch.pageY <= 60) {
-                var holdNum = Math.round((Math.random() * (144 - board.tilesInPlay)));
-                var addition = 0;
-                var hold;
-                for (var h = 0; h <= holdNum; h++) {
-                    if (board.tile[h + addition].inPlay) {
-                        addition++;
-                        h--;
-                    } else {
-                        if (h === holdNum) {
-                            hold = h + addition;
+        if (board.bananaReady === false) {
+            //Peel
+            //    if (board.peelReady) {
+            if (touch.pageX >= 450) {
+                if (touch.pageY <= 60) {
+                    var holdNum = Math.round((Math.random() * (144 - board.tilesInPlay)));
+                    var addition = 0;
+                    var hold;
+                    for (var h = 0; h <= holdNum; h++) {
+                        if (board.tile[h + addition].inPlay) {
+                            addition++;
+                            h--;
+                        } else {
+                            if (h === holdNum) {
+                                hold = h + addition;
+                            }
                         }
                     }
-                }
 
-                board.tile[hold].X = 5;
-                board.tile[hold].Y = 65;
+                    board.tile[hold].X = 5;
+                    board.tile[hold].Y = 65;
 
-                addition = 0;
-                for (var g = 0; g <= board.tilesInPlay; g++) {
-                    if (g + addition < 144) {
-                        if (board.tile[g + addition].inPlay === false) {
-                            addition++;
-                            g--;
-                        } else {
-                            if (board.tile[hold].X === board.tile[g + addition].previousX) {
-                                if (board.tile[hold].Y === board.tile[g + addition].previousY) {
-                                    board.tile[hold].X = board.tile[hold].X + 60;
-                                    if (board.tile[hold].X >= 600) {
-                                        board.tile[hold].Y = board.tile[hold].Y + 60;
-                                        board.tile[hold].X = 5;
+                    addition = 0;
+                    for (var g = 0; g <= board.tilesInPlay; g++) {
+                        if (g + addition < 144) {
+                            if (board.tile[g + addition].inPlay === false) {
+                                addition++;
+                                g--;
+                            } else {
+                                if (board.tile[hold].X === board.tile[g + addition].previousX) {
+                                    if (board.tile[hold].Y === board.tile[g + addition].previousY) {
+                                        board.tile[hold].X = board.tile[hold].X + 60;
+                                        if (board.tile[hold].X >= 600) {
+                                            board.tile[hold].Y = board.tile[hold].Y + 60;
+                                            board.tile[hold].X = 5;
+                                        }
+                                        g = 0;
                                     }
-                                    g = 0;
                                 }
                             }
                         }
                     }
+                    addition = 0;
+                    board.peelReady = false;
+                    board.tile[hold - 1].previousX = board.tile[hold - 1].X;
+                    board.tile[hold - 1].previousY = board.tile[hold - 1].Y;
+                    move(function (p) { return p }, 250, board.tile[hold].X - 300, board.tile[hold].Y + 65, hold - 1, 300, -65);
+                    board.tile[hold - 1].X = 300;
+                    board.tile[hold - 1].Y = -65;
+                    board.tile[hold - 1].inPlay = true;
+                    board.tilesInPlay = board.tilesInPlay + 1;
                 }
-                addition = 0;
-                board.peelReady = false;
-                board.tile[hold - 1].previousX = board.tile[hold - 1].X;
-                board.tile[hold - 1].previousY = board.tile[hold - 1].Y;
-                move(function (p) { return p }, 250, board.tile[hold].X - 300, board.tile[hold].Y + 65, hold - 1, 300, -65);
-                board.tile[hold - 1].X = 300;
-                board.tile[hold - 1].Y = -65;
-                board.tile[hold - 1].inPlay = true;
-                board.tilesInPlay = board.tilesInPlay + 1;
+                //     }
             }
-            //     }
-        }
-        var addition = 0;
-        //look at each tile  
-        for (var g = 0; g < board.tilesInPlay; g++) {
-            if (g + addition < 144) {
-                if (board.tile[g + addition].inPlay === false) {
-                    addition++;
-                    g--;
-                } else {
-                    //check it's location vs the touch
-                    if (touch.pageX >= board.tile[g + addition].X) {
-                        if (touch.pageX <= board.tile[g + addition].X + board.tile[g + addition].Width) {
-                            if (touch.pageY >= board.tile[g + addition].Y) {
-                                if (touch.pageY <= board.tile[g + addition].Y + board.tile[g + addition].Height) {
-                                    //Get the position of the touch in comparison to the tile
-                                    board.tile[g + addition].distX = touch.pageX - board.tile[g + addition].X;
-                                    board.tile[g + addition].distY = touch.pageY - board.tile[g + addition].Y;
-                                    //select the tile
-                                    board.selectedTile[touch.identifier].tileNum = g + addition;
-                                    break;
+            var addition = 0;
+            //look at each tile  
+            for (var g = 0; g < board.tilesInPlay; g++) {
+                if (g + addition < 144) {
+                    if (board.tile[g + addition].inPlay === false) {
+                        addition++;
+                        g--;
+                    } else {
+                        //check it's location vs the touch
+                        if (touch.pageX >= board.tile[g + addition].X) {
+                            if (touch.pageX <= board.tile[g + addition].X + board.tile[g + addition].Width) {
+                                if (touch.pageY >= board.tile[g + addition].Y) {
+                                    if (touch.pageY <= board.tile[g + addition].Y + board.tile[g + addition].Height) {
+                                        //Get the position of the touch in comparison to the tile
+                                        board.tile[g + addition].distX = touch.pageX - board.tile[g + addition].X;
+                                        board.tile[g + addition].distY = touch.pageY - board.tile[g + addition].Y;
+                                        //select the tile
+                                        board.selectedTile[touch.identifier].tileNum = g + addition;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -193,12 +195,15 @@ function handleEnd(evt) {
                     move(function (p) { return p }, 250, board.tile[holdIt[0]].X - 300, board.tile[holdIt[0]].Y + 65, holdIt[0], 300, -65);
                     board.tile[holdIt[0]].X = 300;
                     board.tile[holdIt[0]].Y = -65;
+                    board.tile[holdIt[0]].inPlay = true;
                     move(function (p) { return p }, 250, board.tile[holdIt[1]].X - 300, board.tile[holdIt[1]].Y + 65, holdIt[1], 300, -65);
                     board.tile[holdIt[1]].X = 300;
                     board.tile[holdIt[1]].Y = -65;
+                    board.tile[holdIt[1]].inPlay = true;
                     move(function (p) { return p }, 250, board.tile[holdIt[2]].X - 300, board.tile[holdIt[2]].Y + 65, holdIt[2], 300, -65);
                     board.tile[holdIt[2]].X = 300;
                     board.tile[holdIt[2]].Y = -65;
+                    board.tile[holdIt[2]].inPlay = true;
 
                 }
                 board.tile[path].oldX = board.tile[path].X;
