@@ -1,5 +1,5 @@
 //Declare Variables
-var board = { tile: [], selectedTile: [], tilesInPlay: 8, peelReady: false, words: [], previousTouchX: [], previousTouchY: [] };
+var board = { tile: [], selectedTile: [], tilesInPlay: 8, peelReady: false, words: [], previousTouchX: [], previousTouchY: [], bananaReady: false, youWIN: false };
 var difference;
 var distanceX;
 var distanceY;
@@ -13,6 +13,16 @@ function handleStart(evt) {
     //for each touch
     for (var i = 0; i < evt.changedTouches.length; i++) {
         var touch = evt.changedTouches[i];
+
+        if (touch.pageX <= 225) {
+            if (touch.pageY <= 60) {
+                if (board.bananaReady) {
+                    board.youWIN = true;
+                    draw();
+                }
+            }
+        }
+
         //Peel
         //    if (board.peelReady) {
         if (touch.pageX >= 450) {
@@ -125,178 +135,130 @@ function handleMove(evt) {
 function handleEnd(evt) {
     evt.preventDefault();
     //for each touch
-    for (var i = 0; i < evt.changedTouches.length; i++) {
-        var touch = evt.changedTouches[i];
-        if (board.selectedTile[touch.identifier].tileNum != null) {
-            var path = board.selectedTile[touch.identifier].tileNum
-            if (board.previousTouchY[touch.identifier] - board.tile[path].oldY < -20) {
-                board.tile[path].inPlay = false;
-                board.tilesInPlay = board.tilesInPlay + 2;
-                var addition = 0;
-                var holdIt = [];
-                for (var g = 0; g < 3; g++) {
-                    var hold1 = Math.round((Math.random() * (144 - board.tilesInPlay)));
-                    for (var h = 0; h <= hold1; h++) {
-                        if (board.tile[h + addition].inPlay) {
-                            addition++;
-                            h--;
-                        } else {
-                            if (h === hold1) {
-                                holdIt[g] = h + addition;
+    if (board.bananaReady === false) {
+        for (var i = 0; i < evt.changedTouches.length; i++) {
+            var touch = evt.changedTouches[i];
+            if (board.selectedTile[touch.identifier].tileNum != null) {
+                var path = board.selectedTile[touch.identifier].tileNum
+                if (board.previousTouchY[touch.identifier] - board.tile[path].oldY < -20) {
+                    board.tile[path].inPlay = false;
+                    board.tilesInPlay = board.tilesInPlay + 2;
+                    var addition = 0;
+                    var holdIt = [];
+                    for (var g = 0; g < 3; g++) {
+                        var hold1 = Math.round((Math.random() * (144 - board.tilesInPlay)));
+                        for (var h = 0; h <= hold1; h++) {
+                            if (board.tile[h + addition].inPlay) {
+                                addition++;
+                                h--;
+                            } else {
+                                if (h === hold1) {
+                                    holdIt[g] = h + addition;
+                                }
                             }
                         }
+                        board.tile[holdIt[g]].X = 5 + 60 * g;
+                        board.tile[holdIt[g]].Y = 65;
+                        board.tile[holdIt[g]].previousX = board.tile[holdIt[g]].X;
+                        board.tile[holdIt[g]].previousY = board.tile[holdIt[g]].Y;
+                        board.tile[holdIt[g]].inPlay = true;
+                        addition = 0;
                     }
-                    board.tile[holdIt[g]].X = 5 + 60 * g;
-                    board.tile[holdIt[g]].Y = 65;
-                    board.tile[holdIt[g]].previousX = board.tile[holdIt[g]].X;
-                    board.tile[holdIt[g]].previousY = board.tile[holdIt[g]].Y;
-                    board.tile[holdIt[g]].inPlay = true;
-                    addition = 0;
-                }
 
-                for (var h = 0; h < 3; h++) {
-                    for (var g = 0; g <= board.tilesInPlay + 1; g++) {
-                        if (g + addition < 144) {
-                            if (board.tile[g + addition].inPlay === false) {
-                                addition++;
-                                g--;
-                            } else if (holdIt[h] != g + addition) {
-                                if (board.tile[holdIt[h]].X === board.tile[g + addition].X) {
-                                    if (board.tile[holdIt[h]].Y === board.tile[g + addition].Y) {
-                                        board.tile[holdIt[h]].X = board.tile[holdIt[h]].X + 60;
-                                        if (board.tile[holdIt[h]].X >= 600) {
-                                            board.tile[holdIt[h]].Y = board.tile[holdIt[h]].Y + 60;
-                                            board.tile[holdIt[h]].X = 5;
+                    for (var h = 0; h < 3; h++) {
+                        for (var g = 0; g <= board.tilesInPlay; g++) {
+                            if (g + addition < 144) {
+                                if (board.tile[g + addition].inPlay === false) {
+                                    addition++;
+                                    g--;
+                                } else if (holdIt[h] != g + addition) {
+                                    if (board.tile[holdIt[h]].X === board.tile[g + addition].X) {
+                                        if (board.tile[holdIt[h]].Y === board.tile[g + addition].Y) {
+                                            board.tile[holdIt[h]].X = board.tile[holdIt[h]].X + 60;
+                                            if (board.tile[holdIt[h]].X >= 600) {
+                                                board.tile[holdIt[h]].Y = board.tile[holdIt[h]].Y + 60;
+                                                board.tile[holdIt[h]].X = 5;
+                                            }
+                                            board.tile[holdIt[h]].previousX = board.tile[holdIt[h]].X;
+                                            board.tile[holdIt[h]].previousY = board.tile[holdIt[h]].Y;
+                                            g = 0;
                                         }
-                                        board.tile[holdIt[h]].previousX = board.tile[holdIt[h]].X;
-                                        board.tile[holdIt[h]].previousY = board.tile[holdIt[h]].Y;
-                                        g = 0;
+                                    }
+                                }
+                            }
+                        }
+                        addition = 0;
+                    }
+
+                    move(function (p) { return p }, 250, board.tile[holdIt[0]].X - 300, board.tile[holdIt[0]].Y + 65, holdIt[0], 300, -65);
+                    board.tile[holdIt[0]].X = 300;
+                    board.tile[holdIt[0]].Y = -65;
+                    move(function (p) { return p }, 250, board.tile[holdIt[1]].X - 300, board.tile[holdIt[1]].Y + 65, holdIt[1], 300, -65);
+                    board.tile[holdIt[1]].X = 300;
+                    board.tile[holdIt[1]].Y = -65;
+                    move(function (p) { return p }, 250, board.tile[holdIt[2]].X - 300, board.tile[holdIt[2]].Y + 65, holdIt[2], 300, -65);
+                    board.tile[holdIt[2]].X = 300;
+                    board.tile[holdIt[2]].Y = -65;
+
+                }
+                board.tile[path].oldX = board.tile[path].X;
+                board.tile[path].oldY = board.tile[path].Y;
+                board.tile[path].X = (Math.floor((board.tile[path].X + 30) / 60) * 60) + 5
+                board.tile[path].Y = (Math.floor((board.tile[path].Y + 30) / 60) * 60) + 5
+                var addition = 0;
+                for (var g = 0; g < board.tilesInPlay; g++) {
+                    if (g + addition < 144) {
+                        if (board.tile[g + addition].inPlay === false) {
+                            addition++;
+                            g--;
+                        } else if (path != g + addition) {
+                            if (board.tile[path].X === board.tile[g + addition].X) {
+                                if (board.tile[path].Y === board.tile[g + addition].Y) {
+                                    if (board.tile[path].X === board.tile[g + addition].X) {
+                                        board.tile[path].X = board.tile[path].previousX;
+                                        board.tile[path].Y = board.tile[path].previousY;
                                     }
                                 }
                             }
                         }
                     }
-                    addition = 0;
                 }
-
-                move(function (p) { return p }, 250, board.tile[holdIt[0]].X - 300, board.tile[holdIt[0]].Y + 65, holdIt[0], 300, -65);
-                board.tile[holdIt[0]].X = 300;
-                board.tile[holdIt[0]].Y = -65;
-                move(function (p) { return p }, 250, board.tile[holdIt[1]].X - 300, board.tile[holdIt[1]].Y + 65, holdIt[1], 300, -65);
-                board.tile[holdIt[1]].X = 300;
-                board.tile[holdIt[1]].Y = -65;
-                move(function (p) { return p }, 250, board.tile[holdIt[2]].X - 300, board.tile[holdIt[2]].Y + 65, holdIt[2], 300, -65);
-                board.tile[holdIt[2]].X = 300;
-                board.tile[holdIt[2]].Y = -65;
-
-            }
-            board.tile[path].oldX = board.tile[path].X;
-            board.tile[path].oldY = board.tile[path].Y;
-            board.tile[path].X = (Math.floor((board.tile[path].X + 30) / 60) * 60) + 5
-            board.tile[path].Y = (Math.floor((board.tile[path].Y + 30) / 60) * 60) + 5
-            var addition = 0;
-            for (var g = 0; g < board.tilesInPlay; g++) {
-                if (g + addition < 144) {
-                    if (board.tile[g + addition].inPlay === false) {
-                        addition++;
-                        g--;
-                    } else if (path != g + addition) {
-                        if (board.tile[path].X === board.tile[g + addition].X) {
-                            if (board.tile[path].Y === board.tile[g + addition].Y) {
-                                if (board.tile[path].X === board.tile[g + addition].X) {
-                                    board.tile[path].X = board.tile[path].previousX;
-                                    board.tile[path].Y = board.tile[path].previousY;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (board.tile[path].X < 0) {
-                board.tile[path].X = board.tile[path].previousX;
-                board.tile[path].Y = board.tile[path].previousY;
-            }
-            if (board.tile[path].X > 600) {
-                board.tile[path].X = board.tile[path].previousX;
-                board.tile[path].Y = board.tile[path].previousY;
-            }
-            if (board.tile[path].Y < 0) {
-                board.tile[path].X = board.tile[path].previousX;
-                board.tile[path].Y = board.tile[path].previousY;
-            }
-            if (board.tile[path].Y > 600) {
-                board.tile[path].X = board.tile[path].previousX;
-                board.tile[path].Y = board.tile[path].previousY;
-            }
-            if (board.tile[path].Y === 5) {
-                if (board.tile[path].X >= 450) {
+                if (board.tile[path].X < 0) {
                     board.tile[path].X = board.tile[path].previousX;
                     board.tile[path].Y = board.tile[path].previousY;
                 }
-            }
-
-            //Peel check
-            var wordCount = -1;
-            var addition = 0;
-            var wordHold = "";
-            var peel = true;
-            for (var h = 0; h < board.words.length; h++) {
-                board.words[h] = null;
-            }
-            if (peel === true) {
-                for (var x = 5; x <= 600; x = x + 60) {
-                    for (var y = 5; y < 600; y = y + 60) {
-                        addition = 0;
-                        for (var g = 0; g <= board.tilesInPlay; g++) {
-                            if (peel === true) {
-                                if (g + addition < 144) {
-                                    if (board.tile[g + addition].inPlay === false) {
-                                        addition++;
-                                        g--;
-                                    } else if (board.tile[g + addition].X === x && board.tile[g + addition].Y === y) {
-                                        wordHold = wordHold + board.tile[g + addition].letter;
-                                        break;
-                                    } else if (g === board.tilesInPlay - 1) {
-                                        addition = 0;
-                                        if (wordHold.length === 1) {
-                                            var notAWord = true;
-                                            for (var f = 0; f < board.tilesInPlay; f++) {
-                                                if (f + addition < 144) {
-                                                    if (board.tile[f + addition].inPlay === false) {
-                                                        addition++;
-                                                        f--;
-                                                    } else if (board.tile[f + addition].Y === y - 60) {
-                                                        if (board.tile[f + addition].X === x - 60) {
-                                                            notAWord = false
-                                                            wordHold = "";
-                                                        } else if (board.tile[f + addition].X === x + 60) {
-                                                            notAWord = false
-                                                            wordHold = "";
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            if (notAWord === true) {
-                                                peel = false;
-                                                wordHold = "";
-                                            }
-                                        } else if (wordHold.length > 1) {
-                                            wordCount++;
-                                            board.words[wordCount] = wordHold;
-                                            wordHold = "";
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                if (board.tile[path].X > 600) {
+                    board.tile[path].X = board.tile[path].previousX;
+                    board.tile[path].Y = board.tile[path].previousY;
+                }
+                if (board.tile[path].Y < 0) {
+                    board.tile[path].X = board.tile[path].previousX;
+                    board.tile[path].Y = board.tile[path].previousY;
+                }
+                if (board.tile[path].Y > 600) {
+                    board.tile[path].X = board.tile[path].previousX;
+                    board.tile[path].Y = board.tile[path].previousY;
+                }
+                if (board.tile[path].Y === 5) {
+                    if (board.tile[path].X >= 450) {
+                        board.tile[path].X = board.tile[path].previousX;
+                        board.tile[path].Y = board.tile[path].previousY;
                     }
                 }
-                addition = 0;
-                if (peel != false) {
-                    for (var y = 5; y <= 600; y = y + 60) {
-                        for (var x = 5; x <= 600; x = x + 60) {
+
+                //Peel check
+                var wordCount = -1;
+                var addition = 0;
+                var wordHold = "";
+                var peel = true;
+                for (var h = 0; h < board.words.length; h++) {
+                    board.words[h] = null;
+                }
+                if (peel === true) {
+                    for (var x = 5; x <= 600; x = x + 60) {
+                        for (var y = 5; y < 600; y = y + 60) {
                             addition = 0;
-                            for (var g = 0; g < board.tilesInPlay; g++) {
+                            for (var g = 0; g <= board.tilesInPlay; g++) {
                                 if (peel === true) {
                                     if (g + addition < 144) {
                                         if (board.tile[g + addition].inPlay === false) {
@@ -314,11 +276,11 @@ function handleEnd(evt) {
                                                         if (board.tile[f + addition].inPlay === false) {
                                                             addition++;
                                                             f--;
-                                                        } else if (board.tile[f + addition].X === x - 60) {
-                                                            if (board.tile[f + addition].Y === y + 60) {
+                                                        } else if (board.tile[f + addition].Y === y - 60) {
+                                                            if (board.tile[f + addition].X === x - 60) {
                                                                 notAWord = false
                                                                 wordHold = "";
-                                                            } else if (board.tile[f + addition].Y === y - 60) {
+                                                            } else if (board.tile[f + addition].X === x + 60) {
                                                                 notAWord = false
                                                                 wordHold = "";
                                                             }
@@ -340,47 +302,98 @@ function handleEnd(evt) {
                             }
                         }
                     }
-                }
-            }
-            addition = 0;
-            if (peel != false) {
-                for (var f = 0; f <= wordCount; f++) {
-                    var holding = board.words[f].toLowerCase();
-                    if (dictionary[holding]) {
-                        if (f === wordCount) {
-                            if (peel === true) {
-                                var testing = true;
-                                var progress = 0;
-                                board.tile[0].checked = true;
-                                while (testing === true) {
-                                    for (var g = 0; g < board.tilesInPlay; g++) {
+                    addition = 0;
+                    if (peel != false) {
+                        for (var y = 5; y <= 600; y = y + 60) {
+                            for (var x = 5; x <= 600; x = x + 60) {
+                                addition = 0;
+                                for (var g = 0; g < board.tilesInPlay; g++) {
+                                    if (peel === true) {
                                         if (g + addition < 144) {
                                             if (board.tile[g + addition].inPlay === false) {
                                                 addition++;
                                                 g--;
-                                            } else if (board.tile[g + addition].checked === true) {
-                                                for (var h = 0; h < board.tilesInPlay; h++) {
-                                                    if (h + addition < 144) {
-                                                        if (board.tile[h + addition].inPlay === false) {
-                                                            addition++;
-                                                            h--;
-                                                        } else if (board.tile[h].checked === false) {
-                                                            if (board.tile[g + addition].X === board.tile[h + addition].X) {
-                                                                if (board.tile[g + addition].Y === board.tile[h + addition].Y + 60) {
-                                                                    board.tile[h + addition].checked = true;
-                                                                    g = 0;
-                                                                } else if (board.tile[g + addition].Y === board.tile[h + addition].Y - 60) {
-                                                                    board.tile[h + addition].checked = true;
-                                                                    g = 0;
+                                            } else if (board.tile[g + addition].X === x && board.tile[g + addition].Y === y) {
+                                                wordHold = wordHold + board.tile[g + addition].letter;
+                                                break;
+                                            } else if (g === board.tilesInPlay - 1) {
+                                                addition = 0;
+                                                if (wordHold.length === 1) {
+                                                    var notAWord = true;
+                                                    for (var f = 0; f < board.tilesInPlay; f++) {
+                                                        if (f + addition < 144) {
+                                                            if (board.tile[f + addition].inPlay === false) {
+                                                                addition++;
+                                                                f--;
+                                                            } else if (board.tile[f + addition].X === x - 60) {
+                                                                if (board.tile[f + addition].Y === y + 60) {
+                                                                    notAWord = false
+                                                                    wordHold = "";
+                                                                } else if (board.tile[f + addition].Y === y - 60) {
+                                                                    notAWord = false
+                                                                    wordHold = "";
                                                                 }
                                                             }
-                                                            if (board.tile[g + addition].Y === board.tile[h + addition].Y) {
-                                                                if (board.tile[g + addition].X === board.tile[h + addition].X + 60) {
-                                                                    board.tile[h + addition].checked = true;
-                                                                    g = 0;
-                                                                } else if (board.tile[g + addition].X === board.tile[h + addition].X - 60) {
-                                                                    board.tile[h + addition].checked = true;
-                                                                    g = 0;
+                                                        }
+                                                    }
+                                                    if (notAWord === true) {
+                                                        peel = false;
+                                                        wordHold = "";
+                                                    }
+                                                } else if (wordHold.length > 1) {
+                                                    wordCount++;
+                                                    board.words[wordCount] = wordHold;
+                                                    wordHold = "";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                addition = 0;
+                if (peel != false) {
+                    for (var f = 0; f <= wordCount; f++) {
+                        var holding = board.words[f].toLowerCase();
+                        if (dictionary[holding]) {
+                            if (f === wordCount) {
+                                if (peel === true) {
+                                    var testing = true;
+                                    var progress = 0;
+                                    board.tile[0].checked = true;
+                                    while (testing === true) {
+                                        for (var g = 0; g < board.tilesInPlay; g++) {
+                                            if (g + addition < 144) {
+                                                if (board.tile[g + addition].inPlay === false) {
+                                                    addition++;
+                                                    g--;
+                                                } else if (board.tile[g + addition].checked === true) {
+                                                    var additionV2 = 0;
+                                                    for (var h = 0; h < board.tilesInPlay; h++) {
+                                                        if (h + addition < 144) {
+                                                            if (board.tile[h + additionV2].inPlay === false) {
+                                                                additionV2++;
+                                                                h--;
+                                                            } else if (board.tile[h + additionV2].checked === false) {
+                                                                if (board.tile[g + addition].X === board.tile[h + additionV2].X) {
+                                                                    if (board.tile[g + addition].Y === board.tile[h + additionV2].Y + 60) {
+                                                                        board.tile[h + additionV2].checked = true;
+                                                                        g = 0;
+                                                                    } else if (board.tile[g + addition].Y === board.tile[h + additionV2].Y - 60) {
+                                                                        board.tile[h + additionV2].checked = true;
+                                                                        g = 0;
+                                                                    }
+                                                                }
+                                                                if (board.tile[g + addition].Y === board.tile[h + additionV2].Y) {
+                                                                    if (board.tile[g + addition].X === board.tile[h + additionV2].X + 60) {
+                                                                        board.tile[h + additionV2].checked = true;
+                                                                        g = 0;
+                                                                    } else if (board.tile[g + addition].X === board.tile[h + additionV2].X - 60) {
+                                                                        board.tile[h + additionV2].checked = true;
+                                                                        g = 0;
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -388,42 +401,46 @@ function handleEnd(evt) {
                                                 }
                                             }
                                         }
-                                    }
-                                    addition = 0;
-                                    for (var h = 0; h < board.tilesInPlay; h++) {
-                                        if (h + addition < 144) {
-                                            if (board.tile[h + addition].inPlay === false) {
-                                                addition++;
-                                                h--;
-                                            } else {
-                                                if (board.tile[h + addition].checked === false) {
-                                                    testing = false;
-                                                    board.peelReady = false;
-                                                } else if (h === board.tilesInPlay - 1) {
-                                                    testing = false;
-                                                    board.peelReady = true;
+                                        addition = 0;
+                                        for (var h = 0; h < board.tilesInPlay; h++) {
+                                            if (h + addition <= 144) {
+                                                if (board.tile[h + addition].inPlay === false) {
+                                                    addition++;
+                                                    h--;
+                                                } else {
+                                                    if (board.tile[h + addition].checked === false) {
+                                                        testing = false;
+                                                        board.peelReady = false;
+                                                    } else if (h === board.tilesInPlay - 1 && testing === true) {
+                                                        testing = false;
+                                                        board.peelReady = true;
+                                                        if (board.tilesInPlay >= 2) {
+                                                            board.peelReady = false;
+                                                            board.bananaReady = true;
+                                                        }
+                                                    }
+                                                    board.tile[h + addition].checked = false;
                                                 }
-                                                board.tile[h + addition].checked = false;
                                             }
                                         }
                                     }
                                 }
                             }
+                        } else {
+                            peel = false;
+                            board.peelReady = false;
                         }
-                    } else {
-                        peel = false;
-                        board.peelReady = false;
                     }
+                } else {
+                    board.peelReady = false;
                 }
-            } else {
-                board.peelReady = false;
+
+
+                board.tile[path].previousX = board.tile[path].X;
+                board.tile[path].previousY = board.tile[path].Y;
+                draw();
+                board.selectedTile[touch.identifier].tileNum = null;
             }
-
-
-            board.tile[path].previousX = board.tile[path].X;
-            board.tile[path].previousY = board.tile[path].Y;
-            draw();
-            board.selectedTile[touch.identifier].tileNum = null;
         }
     }
 }
@@ -440,31 +457,43 @@ function draw() {
     var ctx = canvas.getContext('2d');
     ctx.font = "48px serif";
     ctx.clearRect(0, 0, 600, 600);
-    if (board.peelReady === true) {
-        ctx.fillStyle = "lightGreen";
-        ctx.fillRect(450, 0, 600, 54);
-    }
-    else {
-        ctx.fillStyle = "grey";
-        ctx.fillRect(450, 0, 600, 54);
-    }
-    ctx.fillStyle = "black";
-    ctx.fillText("PEEL", 460, 45);
-    ctx.fillRect(449, 54, 600, 1);
-    ctx.fillRect(449, 0, 1, 55);
+    if (board.youWIN) {
+        ctx.fillStyle = "black";
+        ctx.fillText("A WINNER IS YOU!", 100, 300);
+    } else {
+        if (board.peelReady === true) {
+            ctx.fillStyle = "lightGreen";
+            ctx.fillRect(450, 0, 600, 54);
+        }
+        else {
+            ctx.fillStyle = "grey";
+            ctx.fillRect(450, 0, 600, 54);
+        }
+        ctx.fillStyle = "black";
+        ctx.fillText("PEEL", 460, 45);
+        ctx.fillRect(449, 54, 600, 1);
+        ctx.fillRect(449, 0, 1, 55);
 
-    var addition = 0;
-    for (var f = 0; f <= board.tilesInPlay; f++) {
-        if (f + addition < 144) {
-            if (board.tile[f + addition].inPlay) {
-                ctx.fillStyle = "black";
-                ctx.fillRect(board.tile[f + addition].X, board.tile[f + addition].Y, board.tile[f + addition].Width, board.tile[f + addition].Height);
-                ctx.clearRect(board.tile[f + addition].X + 1, board.tile[f + addition].Y + 1, board.tile[f + addition].Width - 2, board.tile[f + addition].Height - 2);
-                ctx.fillText(board.tile[f + addition].letter, board.tile[f + addition].X + 2, board.tile[f + addition].Y + 40);
-            } else {
-                addition++;
-                f--;
+        var addition = 0;
+        for (var f = 0; f <= board.tilesInPlay; f++) {
+            if (f + addition < 144) {
+                if (board.tile[f + addition].inPlay) {
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(board.tile[f + addition].X, board.tile[f + addition].Y, board.tile[f + addition].Width, board.tile[f + addition].Height);
+                    ctx.clearRect(board.tile[f + addition].X + 1, board.tile[f + addition].Y + 1, board.tile[f + addition].Width - 2, board.tile[f + addition].Height - 2);
+                    ctx.fillText(board.tile[f + addition].letter, board.tile[f + addition].X + 2, board.tile[f + addition].Y + 40);
+                } else {
+                    addition++;
+                    f--;
+                }
             }
+        }
+
+        if (board.bananaReady === true) {
+            ctx.fillStyle = "black";
+            ctx.fillText("BANANA", 5, 45);
+            ctx.fillRect(0, 54, 225, 1);
+            ctx.fillRect(224, 0, 1, 55);
         }
     }
 }
@@ -558,5 +587,14 @@ function init() {
             }
         }
     }
+    //For testing
+    board.tile[0].letter = "G"
+    board.tile[1].letter = "O"
+    board.tile[2].letter = "A"
+    board.tile[3].letter = "L"
+    board.tile[4].letter = "G"
+    board.tile[5].letter = "A"
+    board.tile[6].letter = "L"
+    board.tile[7].letter = "A"
     draw();
 }
