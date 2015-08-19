@@ -273,19 +273,19 @@ function handleEnd(evt) {
                                             wordHold = wordHold + board.tile[g + addition].letter;
                                             break;
                                         } else if (g === board.tilesInPlay - 1) {
-                                            addition = 0;
+                                            var additionV2 = 0;
                                             if (wordHold.length === 1) {
                                                 var notAWord = true;
                                                 for (var f = 0; f < board.tilesInPlay; f++) {
-                                                    if (f + addition < 144) {
-                                                        if (board.tile[f + addition].inPlay === false) {
-                                                            addition++;
+                                                    if (f + additionV2 < 144) {
+                                                        if (board.tile[f + additionV2].inPlay === false) {
+                                                            additionV2++;
                                                             f--;
-                                                        } else if (board.tile[f + addition].Y === y - 60) {
-                                                            if (board.tile[f + addition].X === x - 60) {
+                                                        } else if (board.tile[f + additionV2].Y === y - 60) {
+                                                            if (board.tile[f + additionV2].X === x - 60) {
                                                                 notAWord = false
                                                                 wordHold = "";
-                                                            } else if (board.tile[f + addition].X === x + 60) {
+                                                            } else if (board.tile[f + additionV2].X === x + 60) {
                                                                 notAWord = false
                                                                 wordHold = "";
                                                             }
@@ -322,19 +322,19 @@ function handleEnd(evt) {
                                                 wordHold = wordHold + board.tile[g + addition].letter;
                                                 break;
                                             } else if (g === board.tilesInPlay - 1) {
-                                                addition = 0;
+                                                var additionV2 = 0;
                                                 if (wordHold.length === 1) {
                                                     var notAWord = true;
                                                     for (var f = 0; f < board.tilesInPlay; f++) {
-                                                        if (f + addition < 144) {
-                                                            if (board.tile[f + addition].inPlay === false) {
-                                                                addition++;
+                                                        if (f + additionV2 < 144) {
+                                                            if (board.tile[f + additionV2].inPlay === false) {
+                                                                additionV2++;
                                                                 f--;
-                                                            } else if (board.tile[f + addition].X === x - 60) {
-                                                                if (board.tile[f + addition].Y === y + 60) {
+                                                            } else if (board.tile[f + additionV2].X === x - 60) {
+                                                                if (board.tile[f + additionV2].Y === y + 60) {
                                                                     notAWord = false
                                                                     wordHold = "";
-                                                                } else if (board.tile[f + addition].Y === y - 60) {
+                                                                } else if (board.tile[f + additionV2].Y === y - 60) {
                                                                     notAWord = false
                                                                     wordHold = "";
                                                                 }
@@ -419,7 +419,7 @@ function handleEnd(evt) {
                                                     } else if (h === board.tilesInPlay - 1 && testing === true) {
                                                         testing = false;
                                                         board.peelReady = true;
-                                                        if (board.tilesInPlay >= 2) {
+                                                        if (board.tilesInPlay >= 15) {
                                                             board.peelReady = false;
                                                             board.bananaReady = true;
                                                         }
