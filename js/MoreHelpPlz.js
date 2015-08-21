@@ -1,11 +1,31 @@
 //Declare Variables
-var board = { tile: [], selectedTile: [], tilesInPlay: 8, peelReady: false, words: [], previousTouchX: [], previousTouchY: [], bananaReady: false, youWIN: false };
-var difference;
-var distanceX;
-var distanceY;
-var counter = 0;
+var board = { tile: [144], players: [], previousTouchX: [], previousTouchY: []};
+board.players[1] = { selectedTile: [], tilesInPlay: [7], peelReady: false, words: [],  bananaReady: false, youWIN: false };
+board.players[1].tilesInPlay[0] = 0
 
 init();
+
+function addTile(player) {
+    var hold;
+    for (var g = 0; g < board.players.length; g++) {
+        hold = hold + board.players[g].tilesInPlay.length;
+    };
+    var holdNum = Math.round((Math.random() * (144 - hold)));
+    var addition = 0;
+    
+    for (var h = 0; h <= holdNum; h++) {
+        if (board.tile[h + addition].inPlay) {
+            addition++;
+            h--;
+        } else {
+            if (h === holdNum) {
+                hold = h + addition;
+            }
+        }
+    }
+
+    board.players[player].tilesInPlay[board.players[player].tilesInPlay.length] = hold;
+}
 
 //On a touch...
 function handleStart(evt) {
@@ -44,7 +64,6 @@ function handleStart(evt) {
 
                     board.tile[hold].X = 5;
                     board.tile[hold].Y = 65;
-
                     addition = 0;
                     for (var g = 0; g <= board.tilesInPlay; g++) {
                         if (g + addition < 144) {
@@ -52,12 +71,12 @@ function handleStart(evt) {
                                 addition++;
                                 g--;
                             } else {
-                                if (board.tile[hold].X === board.tile[g + addition].previousX) {
-                                    if (board.tile[hold].Y === board.tile[g + addition].previousY) {
-                                        board.tile[hold].X = board.tile[hold].X + 60;
-                                        if (board.tile[hold].X >= 600) {
-                                            board.tile[hold].Y = board.tile[hold].Y + 60;
-                                            board.tile[hold].X = 5;
+                                if (board.tile[hold - 1].X === board.tile[g + addition].X) {
+                                    if (board.tile[hold - 1].Y === board.tile[g + addition].Y) {
+                                        board.tile[hold - 1].X = board.tile[hold - 1].X + 60;
+                                        if (board.tile[hold - 1].X >= 600) {
+                                            board.tile[hold - 1].Y = board.tile[hold - 1].Y + 60;
+                                            board.tile[hold - 1].X = 5;
                                         }
                                         g = 0;
                                     }
@@ -110,6 +129,7 @@ function handleStart(evt) {
 //if a touch moves...
 function handleMove(evt) {
     evt.preventDefault();
+    var counter = 0;
 
     //for each touch
     for (var i = 0; i < evt.changedTouches.length; i++) {
@@ -148,7 +168,7 @@ function handleEnd(evt) {
                     var addition = 0;
                     var holdIt = [];
                     for (var g = 0; g < 3; g++) {
-                        var hold1 = Math.round((Math.random() * (144 - board.tilesInPlay)));
+                        var hold1 = Math.round((Math.random() * (143 - board.tilesInPlay)));
                         for (var h = 0; h <= hold1; h++) {
                             if (board.tile[h + addition].inPlay) {
                                 addition++;
@@ -159,11 +179,10 @@ function handleEnd(evt) {
                                 }
                             }
                         }
-                        board.tile[holdIt[g]].X = 5 + 60 * g;
+                        board.tile[holdIt[g]].X = 5 + (60 * g);
                         board.tile[holdIt[g]].Y = 65;
                         board.tile[holdIt[g]].previousX = board.tile[holdIt[g]].X;
                         board.tile[holdIt[g]].previousY = board.tile[holdIt[g]].Y;
-                        board.tile[holdIt[g]].inPlay = true;
                         addition = 0;
                     }
 
@@ -503,12 +522,8 @@ function draw() {
     }
 }
 
-function move(delta, duration, distanceX, distanceY, selectedTile, startX, startY) {
-    var toX = distanceX;
-    var toY = distanceY;
-    var holdX = startX;
-    var holdY = startY;
-
+function move(delta, duration, toX, toY, selectedTile, holdX, holdY) {
+    
     animate({
         delay: 10,
         duration: duration || 2000,
@@ -553,7 +568,7 @@ function init() {
         }
 
         number[i] = hold;
-        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545, startX: 4 * (i + 1) + 5, checked: false, inPlay: false };
+        board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, oldX: 60 * (i + 1) + 5, oldY: 545, previousX: 4 * (i + 1) + 5, previousY: 545,  checked: false, inPlay: false };
 
         board.selectedTile[i] = { tileNum: null }
     }
@@ -593,6 +608,7 @@ function init() {
         }
     }
     //For testing
+    /*
     board.tile[0].letter = "G"
     board.tile[1].letter = "O"
     board.tile[2].letter = "A"
@@ -601,5 +617,6 @@ function init() {
     board.tile[5].letter = "A"
     board.tile[6].letter = "L"
     board.tile[7].letter = "A"
+    */
     draw();
 }
