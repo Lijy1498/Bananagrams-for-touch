@@ -100,13 +100,13 @@ function handleEnd(evt) {
             for (var g = 0; g < board.tilesInPlay; g++) {
                 var tiles = board.players[1].tilesInPlay[g];
                 if (path != tiles) {
-                        if (board.tile[path].X === board.tile[tiles].X) {
-                            if (board.tile[path].Y === board.tile[tiles].Y) {
-                                if (board.tile[path].X === board.tile[tiles].X) {
-                                    board.tile[path].X = board.tile[path].previousX;
-                                    board.tile[path].Y = board.tile[path].previousY;
-                                }
+                    if (board.tile[path].X === board.tile[tiles].X) {
+                        if (board.tile[path].Y === board.tile[tiles].Y) {
+                            if (board.tile[path].X === board.tile[tiles].X) {
+                                board.tile[path].X = board.tile[path].previousX;
+                                board.tile[path].Y = board.tile[path].previousY;
                             }
+                        }
                     }
                 }
             }
@@ -144,16 +144,16 @@ function handleEnd(evt) {
             if (peel === true) {
                 for (var x = 5; x <= 600; x = x + 60) {
                     for (var y = 5; y < 600; y = y + 60) {
-                        for (var g = 0; g <= board.tilesInPlay; g++) {
+                        for (var g = 0; g < board.players[1].tilesInPlay.length; g++) {
                             var tiles = board.players[1].tilesInPlay[g];
                             if (peel === true) {
                                 if (board.tile[tiles].X === x && board.tile[tiles].Y === y) {
                                     wordHold = wordHold + board.tile[tiles].letter;
                                     break;
-                                } else if (g === board.tilesInPlay - 1) {
+                                } else if (g === board.players[1].tilesInPlay.length - 1) {
                                     if (wordHold.length === 1) {
                                         var notAWord = true;
-                                        for (var f = 0; f < board.tilesInPlay; f++) {
+                                        for (var f = 0; f < board.players[1].tilesInPlay.length; f++) {
                                             var tiles2 = board.players[1].tilesInPlay[f];
                                             if (board.tile[tiles2].Y === y - 60) {
                                                 if (board.tile[tiles2].X === x - 60) {
@@ -182,12 +182,15 @@ function handleEnd(evt) {
                 if (peel != false) {
                     for (var y = 5; y <= 600; y = y + 60) {
                         for (var x = 5; x <= 600; x = x + 60) {
-                            for (var g = 0; g < board.tilesInPlay; g++) {
+                            for (var g = 0; g < board.players[1].tilesInPlay.length; g++) {
                                 var tiles = board.players[1].tilesInPlay[g];
-                                if (g === board.tilesInPlay - 1) {
+                                if (board.tile[tiles].X === x && board.tile[tiles].Y === y) {
+                                    wordHold = wordHold + board.tile[tiles].letter;
+                                    break;
+                                } else if (g === board.players[1].tilesInPlay.length - 1) {
                                     if (wordHold.length === 1) {
                                         var notAWord = true;
-                                        for (var f = 0; f < board.tilesInPlay; f++) {
+                                        for (var f = 0; f < board.players[1].tilesInPlay.length; f++) {
                                             var tiles2 = board.players[1].tilesInPlay[f];
                                             if (board.tile[tiles2].X === x - 60) {
                                                 if (board.tile[tiles2].Y === y + 60) {
@@ -217,7 +220,7 @@ function handleEnd(evt) {
             addition = 0;
             if (peel != false) {
                 for (var f = 0; f <= wordCount; f++) {
-                    var holding = board.words[f].toLowerCase();
+                    var holding = board.players[1].words[f].toLowerCase();
                     if (dictionary[holding]) {
                         if (f === wordCount) {
                             if (peel === true) {
@@ -225,11 +228,11 @@ function handleEnd(evt) {
                                 var progress = 0;
                                 board.tile[0].checked = true;
                                 while (testing === true) {
-                                    for (var g = 0; g < board.tilesInPlay; g++) {
+                                    for (var g = 0; g < board.players[1].tilesInPlay.length; g++) {
                                         var tiles = board.players[1].tilesInPlay[g];
                                         if (board.tile[tiles].checked === true) {
                                             var additionV2 = 0;
-                                            for (var h = 0; h < board.tilesInPlay; h++) {
+                                            for (var h = 0; h < board.players[1].tilesInPlay.length; h++) {
                                                 var tiles2 = board.players[1].tilesInPlay[h];
                                                 if (board.tile[tilesV2].checked === false) {
                                                     if (board.tile[tiles].X === board.tile[tiles2].X) {
@@ -389,16 +392,16 @@ function addTile(player) {
     board.tile[hold].Y = 65;
     for (var g = 0; g <= board.tilesInPlay; g++) {
         var tiles = board.players[1].tilesInPlay[g];
-                if (board.tile[hold - 1].X === board.tile[tiles].X) {
-                    if (board.tile[hold - 1].Y === board.tile[tiles].Y) {
-                        board.tile[hold - 1].X = board.tile[hold - 1].X + 60;
-                        if (board.tile[hold - 1].X >= 600) {
-                            board.tile[hold - 1].Y = board.tile[hold - 1].Y + 60;
-                            board.tile[hold - 1].X = 5;
-                        }
-                        g = 0;
-                    }
+        if (board.tile[hold - 1].X === board.tile[tiles].X) {
+            if (board.tile[hold - 1].Y === board.tile[tiles].Y) {
+                board.tile[hold - 1].X = board.tile[hold - 1].X + 60;
+                if (board.tile[hold - 1].X >= 600) {
+                    board.tile[hold - 1].Y = board.tile[hold - 1].Y + 60;
+                    board.tile[hold - 1].X = 5;
                 }
+                g = 0;
+            }
+        }
     }
     addition = 0;
     board.peelReady = false;
@@ -434,6 +437,7 @@ function init() {
         board.tile[i] = { letter: alphabet.substring(number[i], number[i] + 1), X: 300, Y: -65, Width: 50, Height: 50, distX: -1, distY: -1, previousX: 4 * (i + 1) + 5, previousY: 545, checked: false, inPlay: false };
     }
 
+    board.players[1].tilesInPlay[0] = 0;
     board.players[1].tilesInPlay[1] = 1;
     board.players[1].tilesInPlay[2] = 2;
     board.players[1].tilesInPlay[3] = 3;
