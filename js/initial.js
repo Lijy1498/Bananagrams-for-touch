@@ -68,11 +68,12 @@ function handleMove(evt) {
             board.tile[path].Y = evt.changedTouches[i].pageY - board.tile[path].distY;
             //redraw tiles
             draw(1);
-            if (counter === 50) {
+            if (counter === 0) {
                 board.previousTouchX[touch.identifier] = board.tile[path].X;
                 board.previousTouchY[touch.identifier] = board.tile[path].Y;
+                counter = 20;
             } else {
-                counter++;
+                counter--;
             }
         }
     }
@@ -89,7 +90,7 @@ function handleEnd(evt) {
             var path = board.players[1].selectedTile[touch.identifier]
             board.tile[path].X = (Math.floor((board.tile[path].X + 30) / 60) * 60) + 5;
             board.tile[path].Y = (Math.floor((board.tile[path].Y + 30) / 60) * 60) + 5;
-            if (board.previousTouchY[touch.identifier] - board.tile[path].Y < -20) {
+            if (board.previousTouchY[touch.identifier] - board.tile[path].Y < -15) {
                 board.tile[path].inPlay = false;
                 board.tilesInPlay = board.tilesInPlay + 2;
                 addTile(1);
